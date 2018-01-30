@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -14,20 +15,24 @@ import (
 	"github.com/pkg/errors"
 )
 
-// FeedState is an abstract representation of an RSS/Atom Feed state with additional properties and methods
-type FeedState interface {
+// State is an abstract representation of an RSS/Atom Feed state with additional properties and methods
+type State interface {
 	// FetchTime is when this instance of the feed was fetched
 	FetchTime() time.Time
 	// Hash returns an MD5 hash of the feed from when it was fetched
 	Hash() string
+	// UpdatedState goes over the network and fetches the current state of the RSS feed
+	UpdatedState() (State, error)
+	// Feed returns the underlying Feed object
+	Feed() Feed
 }
 
 // impl is the actual implementation of a Feed
 type impl struct {
-	url       string
-	hash      string
-	fetchTime time.Time
-	feed      Feed
+	URL         string    `json:"url,omitempty"`
+	HashString  string    `json:"hash,omitempty"`
+	FetchedTime time.Time `json:"fetchTime,omitempty"`
+	FeedInfo    Feed      `json:"feed,omitempty"`
 }
 
 // Image is an image that is the artwork for a given
@@ -48,7 +53,6 @@ type Feed struct {
 	Language    string     `json:"language,omitempty"`
 	Image       *Image     `json:"image,omitempty"`
 	Copyright   string     `json:"copyright,omitempty"`
-	Generator   string     `json:"generator,omitempty"`
 	Categories  []string   `json:"categories,omitempty"`
 	Items       []*Item    `json:"items"`
 }
@@ -76,19 +80,39 @@ type Person struct {
 }
 
 // FetchTime returns the time at which this feed was fetched
-func (feed *impl) FetchTime() time.Time{
-	return feed.fetchTime
+func (feed *impl) FetchTime() time.Time {
+	return feed.FetchedTime
 }
 
 // Hash returns the hash value of the feed state
 func (feed *impl) Hash() string {
-	return feed.hash
+	return feed.HashString
 }
 
+// Feed returns the Feed object inside this state
+func (feed *impl) Feed() Feed {
+	return feed.FeedInfo
+}
 
+// ExportJSON returns a JSON dump of the state object
+func (feed *impl) ExportJSON() ([]byte, error) {
+	return json.Marshal(feed)
+}
 
-// NewFeed returns a new instance of the RichFeed type
-func NewFeed(url string) (FeedState, error) {
+// UpdatedState returns an updated version of the rss feed
+func (feed *impl) UpdatedState() (State, error) {
+	return NewState(feed.URL)
+}
+
+// FeedStateFromJSON constructs a State from JSON
+func FeedStateFromJSON(data []byte) (State, error) {
+	state := new(impl)
+	err := json.Unmarshal(data, state)
+	return state, err
+}
+
+// NewState returns a new instance of the RichFeed type
+func NewState(url string) (State, error) {
 	// attempt to fetch the feed from a given url
 	response, err := http.Get(url)
 	if err != nil {
@@ -169,17 +193,22 @@ func NewFeed(url string) (FeedState, error) {
 	feed := Feed{
 		Author:      author,
 		Image:       image,
+		Items:       items,
 		Title:       parsedFeed.Title,
 		Description: parsedFeed.Description,
+		Link:        parsedFeed.Link,
+		FeedLink:    parsedFeed.Link,
+		Updated:     parsedFeed.UpdatedParsed,
+		Published:   parsedFeed.PublishedParsed,
+		Language:    parsedFeed.Language,
+		Categories:  parsedFeed.Categories,
+		Copyright:   parsedFeed.Copyright,
 	}
 
 	return &impl{
-		feed:      feed,
-		url:       url,
-		hash:      hash,
-		fetchTime: fetchTime,
+		FeedInfo:    feed,
+		URL:         url,
+		HashString:  hash,
+		FetchedTime: fetchTime,
 	}, nil
 }
-
-
-
