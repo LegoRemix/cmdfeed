@@ -65,8 +65,8 @@ type Item struct {
 	Description string     `json:"description,omitempty"`
 	Content     string     `json:"content,omitempty"`
 	Link        string     `json:"link,omitempty"`
-	Updated     *time.Time `json:"updatedParsed,omitempty"`
-	Published   *time.Time `json:"publishedParsed,omitempty"`
+	Updated     *time.Time `json:"updated,omitempty"`
+	Published   *time.Time `json:"published,omitempty"`
 	Author      *Person    `json:"author,omitempty"`
 	GUID        string     `json:"guid,omitempty"`
 	Image       *Image     `json:"image,omitempty"`
