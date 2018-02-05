@@ -9,7 +9,7 @@ import (
 )
 
 // searchURL is the host from which we'll be getting our results
-const searchURL = "cloud.feedly.com/v3/search/feeds"
+const searchURL = "https://cloud.feedly.com/v3/search/feeds?"
 
 // feedIDPrefix in front of the rss feed
 const feedIDPrefix = "feed/"

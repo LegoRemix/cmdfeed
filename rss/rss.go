@@ -140,7 +140,7 @@ func NewState(url string) (State, error) {
 	fetchTime := time.Now().UTC()
 
 	// Convert all of our items into the proper format
-	items := make([]*Item, len(parsedFeed.Items))
+	items := make([]*Item, 0, len(parsedFeed.Items))
 	for _, item := range parsedFeed.Items {
 		if item == nil {
 			continue
