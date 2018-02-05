@@ -31,12 +31,12 @@ type Entry struct {
 }
 
 // Search returns the list of the results from a query
-func Search(param string) (Result, error) {
+func Search(query string) (Result, error) {
 	//set up the search parameters
 	params := make(url.Values)
 	params.Set("limit", searchLimit)
 	params.Set("media", "podcast")
-	params.Set("term", param)
+	params.Set("term", query)
 
 	// make the GET request to the API
 	res, err := http.Get(searchURL + params.Encode())
