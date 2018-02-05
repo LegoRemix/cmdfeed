@@ -24,26 +24,27 @@ type Entry struct {
 	Name              string   `json:"collectionName"`
 	ArtistName        string   `json:"artistName"`
 	Genres            []string `json:"genres"`
-	ArtworkURL        string   `json:"artworkUrl512"`
+	ArtworkURL        string   `json:"artworkUrl600"`
 	UserRatingCount   int64    `json:"userRatingCount"`
 	AverageUserRating float64  `json:"averageUserRating"`
-	Description       string   `json:"description"`
 	FeedURL           string   `json:"feedUrl"`
 }
 
 // Search returns the list of the results from a query
 func Search(param string) (Result, error) {
 	//set up the search parameters
-	var params url.Values
+	params := make(url.Values)
 	params.Set("limit", searchLimit)
 	params.Set("media", "podcast")
-	params.Set("term", url.QueryEscape(param))
+	params.Set("term", param)
 
+	// make the GET request to the API
 	res, err := http.Get(searchURL + params.Encode())
 	if err != nil {
 		return Result{}, err
 	}
 
+	// read the JSON body into our struct
 	var result Result
 	defer res.Body.Close()
 	if err = json.NewDecoder(res.Body).Decode(&result); err != nil {
