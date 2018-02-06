@@ -17,7 +17,7 @@ const feedIDPrefix = "feed/"
 // Result contains our search result for search
 type Result struct {
 	Hint    string   `json:"hint"`
-	Entries []Entry  `json:"results"`
+	Results []Entry  `json:"results"`
 	Related []string `json:"related"`
 }
 
