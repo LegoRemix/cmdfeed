@@ -2,11 +2,13 @@
 package subscription
 
 import (
-	"github.com/pkg/errors"
 	"encoding/hex"
 	"encoding/json"
 	"sort"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/satori/go.uuid"
 
 	"github.com/LegoRemix/rss-cli/rss"
 )
@@ -20,6 +22,7 @@ type impl struct {
 	Entries []Entry   `json:"entries"`
 	Feed    rss.State `json:"feed"`
 	Opts    Options   `json:"options"`
+	UUID    uuid.UUID `json:"uuid"`
 }
 
 // Options lets one control exactly how a subscription state is managed
@@ -147,6 +150,7 @@ func NewState(url string, opt Options) (State, error) {
 		Feed:    feedState,
 		Entries: entries,
 		Opts:    opt,
+		UUID:    uuid.NewV4(),
 	}, nil
 }
 
@@ -170,5 +174,6 @@ func (s *impl) Update() (State, error) {
 		Feed:    updated,
 		Entries: newEntries,
 		Opts:    s.Opts,
+		UUID:    s.UUID,
 	}, nil
 }
