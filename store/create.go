@@ -2,6 +2,7 @@
 package store
 
 import (
+	"github.com/mitchellh/go-homedir"
 	"github.com/coreos/bbolt"
 )
 
