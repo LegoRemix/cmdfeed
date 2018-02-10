@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 
-	"github.com/LegoRemix/rss-cli/rss"
+	"github.com/LegoRemix/cmdfeed/rss"
 )
 
 // State represents the current state of a subscription to a feed
