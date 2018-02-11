@@ -16,6 +16,7 @@ import (
 // State represents the current state of a subscription to a feed
 type State interface {
 	EntryList() []Entry
+	UniqueID() uuid.UUID
 }
 
 type impl struct {
@@ -47,9 +48,24 @@ type Entry struct {
 	AuthorEmail string    `json:"author_email,omitempty"`
 }
 
+// StateWithOptions returns a new copy of the state with the given options
+func (s *impl) StateWithOptions(opt Options) State {
+	return &impl{
+		Entries: s.Entries,
+		Feed:    s.Feed,
+		Opts:    opt,
+		UUID:    s.UUID,
+	}
+}
+
 // EntryList returns the list of entries in this sub State
 func (s *impl) EntryList() []Entry {
 	return s.Entries
+}
+
+// returns a UUID for this st
+func (s *impl) UniqueID() uuid.UUID {
+	return s.UUID
 }
 
 // ID creates a unique ID for the entry

@@ -94,18 +94,13 @@ func (feed *impl) Feed() Feed {
 	return feed.FeedInfo
 }
 
-// ExportJSON returns a JSON dump of the state object
-func (feed *impl) ExportJSON() ([]byte, error) {
-	return json.Marshal(feed)
-}
-
 // UpdatedState returns an updated version of the rss feed
 func (feed *impl) UpdatedState() (State, error) {
 	return NewState(feed.URL)
 }
 
-// FeedStateFromJSON constructs a State from JSON
-func FeedStateFromJSON(data []byte) (State, error) {
+// feedStateFromJSON constructs a State from JSON
+func feedStateFromJSON(data []byte) (*impl, error) {
 	state := new(impl)
 	err := json.Unmarshal(data, state)
 	return state, err
