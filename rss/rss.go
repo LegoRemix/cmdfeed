@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -29,54 +28,54 @@ type State interface {
 
 // impl is the actual implementation of a Feed
 type impl struct {
-	URL         string    `json:"url,omitempty"`
-	HashString  string    `json:"hash,omitempty"`
-	FetchedTime time.Time `json:"fetchTime,omitempty"`
-	FeedInfo    Feed      `json:"feed,omitempty"`
+	URL         string    `msgpack:"url,omitempty"`
+	HashString  string    `msgpack:"hash,omitempty"`
+	FetchedTime time.Time `msgpack:"fetchTime,omitempty"`
+	FeedInfo    Feed      `msgpack:"feed,omitempty"`
 }
 
 // Image is an image that is the artwork for a given
 type Image struct {
-	URL   string `json:"url,omitempty"`
-	Title string `json:"title,omitempty"`
+	URL   string `msgpack:"url,omitempty"`
+	Title string `msgpack:"title,omitempty"`
 }
 
 // Feed is an RSS Feed
 type Feed struct {
-	Title       string     `json:"title,omitempty"`
-	Description string     `json:"description,omitempty"`
-	Link        string     `json:"link,omitempty"`
-	FeedLink    string     `json:"feedLink,omitempty"`
-	Updated     *time.Time `json:"updated,omitempty"`
-	Published   *time.Time `json:"published,omitempty"`
-	Author      *Person    `json:"author,omitempty"`
-	Language    string     `json:"language,omitempty"`
-	Image       *Image     `json:"image,omitempty"`
-	Copyright   string     `json:"copyright,omitempty"`
-	Categories  []string   `json:"categories,omitempty"`
-	Items       []*Item    `json:"items"`
+	Title       string     `msgpack:"title,omitempty"`
+	Description string     `msgpack:"description,omitempty"`
+	Link        string     `msgpack:"link,omitempty"`
+	FeedLink    string     `msgpack:"feedLink,omitempty"`
+	Updated     *time.Time `msgpack:"updated,omitempty"`
+	Published   *time.Time `msgpack:"published,omitempty"`
+	Author      *Person    `msgpack:"author,omitempty"`
+	Language    string     `msgpack:"language,omitempty"`
+	Image       *Image     `msgpack:"image,omitempty"`
+	Copyright   string     `msgpack:"copyright,omitempty"`
+	Categories  []string   `msgpack:"categories,omitempty"`
+	Items       []*Item    `msgpack:"items"`
 }
 
 // Item is the universal Item type that atom.Entry
 // and rss.Item gets translated to.  It represents
 // a single entry in a given feed.
 type Item struct {
-	Title       string     `json:"title,omitempty"`
-	Description string     `json:"description,omitempty"`
-	Content     string     `json:"content,omitempty"`
-	Link        string     `json:"link,omitempty"`
-	Updated     *time.Time `json:"updated,omitempty"`
-	Published   *time.Time `json:"published,omitempty"`
-	Author      *Person    `json:"author,omitempty"`
-	GUID        string     `json:"guid,omitempty"`
-	Image       *Image     `json:"image,omitempty"`
-	Categories  []string   `json:"categories,omitempty"`
+	Title       string     `msgpack:"title,omitempty"`
+	Description string     `msgpack:"description,omitempty"`
+	Content     string     `msgpack:"content,omitempty"`
+	Link        string     `msgpack:"link,omitempty"`
+	Updated     *time.Time `msgpack:"updated,omitempty"`
+	Published   *time.Time `msgpack:"published,omitempty"`
+	Author      *Person    `msgpack:"author,omitempty"`
+	GUID        string     `msgpack:"guid,omitempty"`
+	Image       *Image     `msgpack:"image,omitempty"`
+	Categories  []string   `msgpack:"categories,omitempty"`
 }
 
 // Person is an individual specified in a feed
 type Person struct {
-	Name  string `json:"name,omitempty"`
-	Email string `json:"email,omitempty"`
+	Name  string `msgpack:"name,omitempty"`
+	Email string `msgpack:"email,omitempty"`
 }
 
 // FetchTime returns the time at which this feed was fetched
@@ -97,13 +96,6 @@ func (feed *impl) Feed() Feed {
 // UpdatedState returns an updated version of the rss feed
 func (feed *impl) UpdatedState() (State, error) {
 	return NewState(feed.URL)
-}
-
-// feedStateFromJSON constructs a State from JSON
-func feedStateFromJSON(data []byte) (*impl, error) {
-	state := new(impl)
-	err := json.Unmarshal(data, state)
-	return state, err
 }
 
 // NewState returns a new instance of the RichFeed type

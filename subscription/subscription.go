@@ -3,9 +3,10 @@ package subscription
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"sort"
 	"time"
+
+	"github.com/vmihailenco/msgpack"
 
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
@@ -20,32 +21,32 @@ type State interface {
 }
 
 type impl struct {
-	Entries []Entry   `json:"entries"`
-	Feed    rss.State `json:"feed"`
-	Opts    Options   `json:"options"`
-	UUID    uuid.UUID `json:"uuid"`
+	Entries []Entry   `msgpack:"entries"`
+	Feed    rss.State `msgpack:"feed"`
+	Opts    Options   `msgpack:"options"`
+	UUID    uuid.UUID `msgpack:"uuid"`
 }
 
 // Options lets one control exactly how a subscription state is managed
 type Options struct {
 	// IncludeRemovedEntries controls whether we keep entries not in the current FeedState in the Subscription
-	IncludeRemovedEntries bool `json:"include_removed_entries,omitempty"`
+	IncludeRemovedEntries bool `msgpack:"include_removed_entries,omitempty"`
 }
 
 // Entry represents a single entry in a subscription feed, it has slightly different semantics from rss.Item
 type Entry struct {
-	Title       string    `json:"title,omitempty"`
-	Description string    `json:"description,omitempty"`
-	Content     string    `json:"content,omitempty"`
-	Link        string    `json:"link,omitempty"`
-	Updated     time.Time `json:"updated,omitempty"`
-	Published   time.Time `json:"published,omitempty"`
-	GUID        string    `json:"guid,omitempty"`
-	Categories  []string  `json:"categories,omitempty"`
-	ImageTitle  string    `json:"image_title,omitempty"`
-	ImageURL    string    `json:"image_url, omitempty"`
-	AuthorName  string    `json:"author_name,omitempty"`
-	AuthorEmail string    `json:"author_email,omitempty"`
+	Title       string    `msgpack:"title,omitempty"`
+	Description string    `msgpack:"description,omitempty"`
+	Content     string    `msgpack:"content,omitempty"`
+	Link        string    `msgpack:"link,omitempty"`
+	Updated     time.Time `msgpack:"updated,omitempty"`
+	Published   time.Time `msgpack:"published,omitempty"`
+	GUID        string    `msgpack:"guid,omitempty"`
+	Categories  []string  `msgpack:"categories,omitempty"`
+	ImageTitle  string    `msgpack:"image_title,omitempty"`
+	ImageURL    string    `msgpack:"image_url, omitempty"`
+	AuthorName  string    `msgpack:"author_name,omitempty"`
+	AuthorEmail string    `msgpack:"author_email,omitempty"`
 }
 
 // StateWithOptions returns a new copy of the state with the given options
@@ -74,7 +75,7 @@ func (e Entry) ID() (string, error) {
 		return e.GUID, nil
 	}
 
-	hashed, err := json.Marshal(e)
+	hashed, err := msgpack.Marshal(e)
 	if err != nil {
 		return "", err
 	}
